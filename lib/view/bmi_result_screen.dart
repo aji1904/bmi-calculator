@@ -1,15 +1,24 @@
 import 'package:flutter/material.dart';
+import 'package:pelatihan_flutter/constants/constants.dart';
+import 'package:pelatihan_flutter/helper/bmi_calculator.dart';
 import 'package:pelatihan_flutter/view/bmi_data_screen.dart';
 
 // ignore: camel_case_types
 class bmi_result extends StatelessWidget {
-  const bmi_result({Key? key, required this.bmi}) : super(key: key);
+  const bmi_result({
+    Key? key,
+    required this.bmi,
+  }) : super(key: key);
 
   final double bmi;
-  
+  // final bmiCalculator? bmiCalculatorHasil;
 
   @override
   Widget build(BuildContext context) {
+    final bmiCalculator bmiHasilCalculator = bmiCalculator.fromBmiValue(bmi);
+    bmiHasilCalculator.determinanBMI();
+    bmiHasilCalculator.getHealtRisk();
+
     return Scaffold(
       appBar: AppBar(
         title: const Text("HASIL HITUNG BMI"),
@@ -29,33 +38,37 @@ class bmi_result extends StatelessWidget {
             ),
           ),
           Expanded(
+            flex: 6,
             child: Container(
-              padding: EdgeInsets.all(12.0),
+              padding: const EdgeInsets.all(12.0),
               width: double.infinity,
               child: bmi_card(
                 child: Column(
                     mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                     children: [
                       Text(
-                        "Normal",
-                        style: TextStyle(
+                        (bmiHasilCalculator.categoryBMI == null)
+                            ? ""
+                            : bmiHasilCalculator.categoryBMI!,
+                        textAlign: TextAlign.center,
+                        style: const TextStyle(
                           fontSize: 40,
                           fontWeight: FontWeight.bold,
                           color: Colors.white,
                         ),
                       ),
                       Text(
-                        "${bmi.toStringAsFixed(1)}",
-                        style: TextStyle(
+                        bmi.toStringAsFixed(1),
+                        style: const TextStyle(
                           fontSize: 100,
                           fontWeight: FontWeight.bold,
                           color: Colors.white,
                         ),
                       ),
                       Text(
-                        "Skor BMI kamu rendah, kamu harus banyak makan",
+                        bmiHasilCalculator.categoryDesc!,
                         textAlign: TextAlign.center,
-                        style: TextStyle(
+                        style: const TextStyle(
                           fontSize: 20,
                           fontWeight: FontWeight.bold,
                           color: Colors.white,
@@ -64,7 +77,6 @@ class bmi_result extends StatelessWidget {
                     ]),
               ),
             ),
-            flex: 6,
           ),
           GestureDetector(
             onTap: () {

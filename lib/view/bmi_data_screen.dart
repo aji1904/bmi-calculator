@@ -2,6 +2,7 @@ import 'dart:math';
 
 import 'package:flutter/material.dart';
 import 'package:pelatihan_flutter/constants/constants.dart';
+import 'package:pelatihan_flutter/helper/bmi_calculator.dart';
 import 'package:pelatihan_flutter/view/bmi_result_screen.dart';
 
 // ignore: camel_case_types
@@ -17,13 +18,7 @@ class _bmi_data_screenState extends State<bmi_data_screen> {
   int height = 165;
   int weight = 50;
   int age = 20;
-
-  double calculateBMI() {
-    double heightinMeter = height / 100;
-    final pangkat = pow(heightinMeter, 2);
-    double hasil = weight / pangkat;
-    return hasil;
-  }
+  String? gender;
 
   @override
   Widget build(BuildContext context) {
@@ -38,22 +33,38 @@ class _bmi_data_screenState extends State<bmi_data_screen> {
               color: const Color(0xff111318),
               padding: const EdgeInsets.all(12.0),
               child: Row(
-                children: const [
+                children: [
                   Expanded(
-                    child: bmi_card(
-                      child: gender_icon_text(
-                        icon_data: Icons.male,
-                        title: 'MALE',
+                    child: GestureDetector(
+                      onTap: (() {
+                        gender = "male";
+                        setState(() {});
+                      }),
+                      child: bmi_card(
+                        borderColor:
+                            (gender == "male") ? Colors.white : primaryColor,
+                        child: const gender_icon_text(
+                          icon_data: Icons.male,
+                          title: 'MALE',
+                        ),
                       ),
                     ),
                   ),
-                  Padding(
+                  const Padding(
                     padding: EdgeInsets.only(left: 12.0),
                   ),
                   Expanded(
-                    child: bmi_card(
-                      child: gender_icon_text(
-                          title: "FEMALE", icon_data: Icons.female),
+                    child: GestureDetector(
+                      onTap: () {
+                        gender = "female";
+                        setState(() {});
+                      },
+                      child: bmi_card(
+                        borderColor:
+                            (gender == "female") ? Colors.white : primaryColor,
+                        child: const gender_icon_text(
+                            title: "FEMALE", icon_data: Icons.female),
+                      ),
                     ),
                   )
                 ],
@@ -202,13 +213,13 @@ class _bmi_data_screenState extends State<bmi_data_screen> {
           ),
           GestureDetector(
             onTap: () {
-              // print(calculateBMI());
+              final bmiCalculatorHasil =
+                  bmiCalculator(height: height, weight: weight);
+
               Navigator.of(context).push(
                 MaterialPageRoute(
                   builder: ((context) {
-                    return bmi_result(
-                      bmi: calculateBMI(),
-                    );
+                    return bmi_result(bmi: bmiCalculatorHasil.calculateBMI());
                   }),
                 ),
               );
@@ -252,10 +263,11 @@ class button_action extends StatelessWidget {
     return RawMaterialButton(
       onPressed: onpress,
       elevation: 0,
+      // ignore: sort_child_properties_last
       child: Icon(icon),
-      shape: CircleBorder(),
+      shape: const CircleBorder(),
       fillColor: Colors.white,
-      constraints: BoxConstraints.tightFor(
+      constraints: const BoxConstraints.tightFor(
         width: 35,
         height: 56,
       ),
@@ -263,13 +275,16 @@ class button_action extends StatelessWidget {
   }
 }
 
+// ignore: camel_case_types
 class bmi_card extends StatelessWidget {
   const bmi_card({
     this.child,
     Key? key,
+    this.borderColor = primaryColor,
   }) : super(key: key);
 
   final Widget? child;
+  final Color? borderColor;
 
   @override
   Widget build(BuildContext context) {
@@ -279,6 +294,7 @@ class bmi_card extends StatelessWidget {
         borderRadius: BorderRadius.circular(
           20.0,
         ),
+        border: Border.all(color: borderColor!),
       ),
       child: child,
     );
